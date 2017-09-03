@@ -1,3 +1,7 @@
+// @flow
+import ParseNode from "./ParseNode";
+import {Token} from "./Token";
+
 /**
  * This is the ParseError class, which is the main error thrown by KaTeX
  * functions when something has gone wrong. This is used to distinguish internal
@@ -5,12 +9,14 @@
  *
  * If possible, a caller should provide a Token or ParseNode with information
  * about where in the source string the problem occurred.
- *
- * @param {string} message  The error message
- * @param {(Token|ParseNode)=} token  An object providing position information
  */
 class ParseError {
-    constructor(message, token) {
+    position: number|void; // Error position based on passed-in Token or ParseNode.
+
+    constructor(
+        message: string,         // The error message
+        token?: Token|ParseNode, // An object providing position information
+    ) {
         let error = "KaTeX parse error: " + message;
         let start;
         let end;
