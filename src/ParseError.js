@@ -9,17 +9,18 @@ import {Token} from "./Token";
  *
  * If possible, a caller should provide a Token or ParseNode with information
  * about where in the source string the problem occurred.
+ *
+ * @param {string} message  The error message
+ * @param {(Token|ParseNode)=} token  An object providing position information
  */
 class ParseError {
-    position: number|void; // Error position based on passed-in Token or ParseNode.
+    position: number    // Error position based on passed-in Token or ParseNode.
+    name: string        // "ParseError"
 
-    constructor(
-        message: string,         // The error message
-        token?: Token|ParseNode, // An object providing position information
-    ) {
+    constructor(message: string, token?: Token|ParseNode) {
         let error = "KaTeX parse error: " + message;
-        let start;
-        let end;
+        let start = NaN;
+        let end = NaN;
 
         if (token && token.lexer && token.start <= token.end) {
             // If we have the input and a position, make the error a bit fancier
@@ -57,8 +58,10 @@ class ParseError {
 
         // Some hackery to make ParseError a prototype of Error
         // See http://stackoverflow.com/a/8460753
-        const self = new Error(error);
+        const self: ParseError = (new Error(error): any);
         self.name = "ParseError";
+
+        // $FlowFixMe
         self.__proto__ = ParseError.prototype;
 
         self.position = start;
@@ -67,6 +70,7 @@ class ParseError {
 }
 
 // More hackery
+// $FlowFixMe
 ParseError.prototype.__proto__ = Error.prototype;
 
 module.exports = ParseError;
